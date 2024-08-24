@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        
         System.out.println("Welcome to the Online Shopping Portal!");
         System.out.println("========================================");
         Scanner scanner = new Scanner(System.in);
@@ -26,8 +27,13 @@ public class Main {
                 System.out.println("User Registration Page");
                 User user = RegistrationOperations.createUserFromInput();
                 try {
-                    RegistrationOperations.addUser(user);
-                    HandleUserOperations.handleUserOperations(user);
+                    if(RegistrationOperations.addUser(user)){
+                        HandleUserOperations.handleUserOperations(user);
+                    }
+                    else {
+                        System.out.println("User already exists or You are administering the User as an ADMIN");
+                    }
+
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

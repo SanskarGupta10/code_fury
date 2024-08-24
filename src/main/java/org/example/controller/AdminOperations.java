@@ -171,6 +171,140 @@ public class AdminOperations {
         }
     }
 
+    // Method to activate a subscription
+    public static void activateSubscription(int subscriptionID) throws SQLException {
+        String query = "UPDATE Subscriptions SET SubscriptionStatus = 'ACTIVE' WHERE SubscriptionID = ?";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+
+            pstmt.setInt(1, subscriptionID);
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Subscription activated successfully.");
+            } else {
+                System.out.println("Subscription not found.");
+            }
+        }
+    }
+
+    // Method to deactivate a subscription
+    public static void deactivateSubscription(int subscriptionID) throws SQLException {
+        String query = "UPDATE Subscriptions SET SubscriptionStatus = 'INACTIVE' WHERE SubscriptionID = ?";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+
+            pstmt.setInt(1, subscriptionID);
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Subscription deactivated successfully.");
+            } else {
+                System.out.println("Subscription not found.");
+            }
+        }
+    }
+
+    // Method to view daily delivery list based on active subscriptions
+    public static void viewDailyDeliveryList(Date nextDeliveryDate) throws SQLException {
+        String query = "SELECT P.ProductName, PD.NextDeliveryDate, U.FirstName, U.LastName, U.Address " +
+                "FROM ProductDeliveryDetails PD " +
+                "JOIN SubscriptionProducts SP ON PD.SubscriptionProductID = SP.ID " +
+                "JOIN Products P ON SP.ProductID = P.ProductID " +
+                "JOIN Orders O ON PD.OrderID = O.OrderID " +
+                "JOIN Users U ON O.UserID = U.UserID " +
+                "WHERE PD.NextDeliveryDate = ? AND O.OrderStatus = 'ACTIVE'";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+
+            pstmt.setDate(1, nextDeliveryDate);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.isBeforeFirst()) { // No data found
+                    System.out.println("No deliveries scheduled for this date.");
+                } else {
+                    while (rs.next()) {
+                        String productName = rs.getString("ProductName");
+                        Date deliveryDate = rs.getDate("NextDeliveryDate");
+                        String firstName = rs.getString("FirstName");
+                        String lastName = rs.getString("LastName");
+                        String address = rs.getString("Address");
+
+                        System.out.println("Product: " + productName);
+                        System.out.println("Delivery Date: " + deliveryDate);
+                        System.out.println("Customer: " + firstName + " " + lastName);
+                        System.out.println("Address: " + address);
+                        System.out.println("----------------------------------------");
+                    }
+                }
+            }
+        }
+    }
+
+    // Method to view all active and inactive subscriptions
+    public static void viewAllSubscriptions() throws SQLException {
+        String query = "SELECT * FROM Subscriptions";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int subscriptionID = rs.getInt("SubscriptionID");
+                String subscriptionName = rs.getString("SubscriptionName");
+                String subscriptionDescription = rs.getString("SubscriptionDescription");
+                String subscriptionCategory = rs.getString("SubscriptionCategory");
+                String subscriptionStatus = rs.getString("SubscriptionStatus");
+                int subscriptionCount = rs.getInt("SubscriptionCount");
+
+                System.out.println("ID: " + subscriptionID);
+                System.out.println("Name: " + subscriptionName);
+                System.out.println("Description: " + subscriptionDescription);
+                System.out.println("Category: " + subscriptionCategory);
+                System.out.println("Status: " + subscriptionStatus);
+                System.out.println("Count: " + subscriptionCount);
+                System.out.println("----------------------------------------");
+            }
+        }
+    }
+
+    // Method to view order dashboard
+    public static void viewOrderDashboard() throws SQLException {
+        String query = "SELECT O.OrderID, U.FirstName, U.LastName, P.ProductName, O.OrderDate, O.StartDate, O.EndDate, O.OrderStatus " +
+                "FROM Orders O " +
+                "JOIN Subscriptions S ON O.SubscriptionID = S.SubscriptionID " +
+                "JOIN SubscriptionProducts SP ON S.SubscriptionID = SP.SubscriptionID " +
+                "JOIN Products P ON SP.ProductID = P.ProductID " +
+                "JOIN Users U ON O.UserID = U.UserID";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int orderID = rs.getInt("OrderID");
+                String firstName = rs.getString("FirstName");
+                String lastName = rs.getString("LastName");
+                String productName = rs.getString("ProductName");
+                String orderDate = rs.getString("OrderDate");
+                String startDate = rs.getString("StartDate");
+                String endDate = rs.getString("EndDate");
+                String orderStatus = rs.getString("OrderStatus");
+
+                System.out.println("Order ID: " + orderID);
+                System.out.println("Customer: " + firstName + " " + lastName);
+                System.out.println("Product: " + productName);
+                System.out.println("Order Date: " + orderDate);
+                System.out.println("Start Date: " + startDate);
+                System.out.println("End Date: " + endDate);
+                System.out.println("Status: " + orderStatus);
+                System.out.println("----------------------------------------");
+            }
+        }
+    }
+
     // Helper method to display order details
     private static void displayOrderDetails(ResultSet rs) throws SQLException {
         System.out.println("OrderID: " + rs.getInt("OrderID"));

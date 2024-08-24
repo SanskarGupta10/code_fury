@@ -15,8 +15,10 @@ public class HandleUserOperations {
             System.out.println("3. View Order History");
             System.out.println("4. View User Profile");
             System.out.println("5. Show Products by Category");
-            System.out.println("6. View Cart");
-            System.out.println("7. Exit");
+            System.out.println("6. Show All Subscriptions");
+            System.out.println("7. Subscriptions");
+            System.out.println("8. Show Deliverables");
+            System.out.println("9. Exit");
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -52,6 +54,14 @@ public class HandleUserOperations {
                         break;
 
                     case 7:
+                        UserOperations.subscriptions(user);
+                        break;
+
+                    case 8:
+                        UserOperations.showDeliverables(user);
+                        break;
+                        
+                    case 9:
                         System.out.println("Exiting...");
                         scanner.close();
                         return;

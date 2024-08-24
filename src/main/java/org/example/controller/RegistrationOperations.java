@@ -67,10 +67,10 @@ public class RegistrationOperations {
     }
 
     // Method to add a user to the database
-    public static void addUser(User user) throws SQLException {
+    public static boolean addUser(User user) throws SQLException {
        if(user.getRole().toString().equalsIgnoreCase("ADMIN")){
               System.out.println("Access Denied: Admins cannot be added as users.");
-              return;
+              return false;
          }
         String query = "INSERT INTO Users (UserID, FirstName, LastName, emailId, Password, Address, securityQuestion, " +
                 "securityAnswer, paymentMethod, cardNumber, cardCVV, cardExpiryDate, role) " +
@@ -89,11 +89,17 @@ public class RegistrationOperations {
             pstmt.setString(9, user.getPaymentDetails());
             pstmt.setString(10, user.getCardNumber());
             pstmt.setString(11, user.getCardCVV());
-            pstmt.setDate(12, new java.sql.Date(user.getCardExpiryDate().getTime()));
+            // Check if cardExpiryDate is null
+            if (user.getCardExpiryDate() != null) {
+                pstmt.setDate(12, new java.sql.Date(user.getCardExpiryDate().getTime()));
+            } else {
+                pstmt.setNull(12, java.sql.Types.DATE);
+            }
             pstmt.setString(13, user.getRole().toString());
 
             pstmt.executeUpdate();
             System.out.println("User added successfully.");
+            return true;
         }
         catch (SQLException e) {
             throw new SQLException("Error adding user to the database.");

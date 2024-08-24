@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.model.User;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -18,8 +19,12 @@ public class HandleAdminOperations {
             System.out.println("6. Show All Order History");
             System.out.println("7. Show Order History by Product ID");
             System.out.println("8. Show Order History by User ID");
-            System.out.println("9. Exit");
-
+            System.out.println("9. Activate Subscription");
+            System.out.println("10. Deactivate Subscription");
+            System.out.println("11. View Daily Delivery List");
+            System.out.println("12. View All Subscriptions");
+            System.out.println("13. View Order Dashboard");
+            System.out.println("14. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
 
@@ -104,6 +109,37 @@ public class HandleAdminOperations {
                         break;
 
                     case 9:
+                        System.out.print("Enter Subscription ID to Activate: ");
+                        int subscriptionId2 = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+
+                        AdminOperations.activateSubscription(subscriptionId2);
+                        break;
+
+                    case 10:
+                        System.out.println("Enter Subscription ID to Deactivate: ");
+                        int subscriptionId3 = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+
+                        AdminOperations.deactivateSubscription(subscriptionId3);
+                        break;
+
+                    case 11:
+                        System.out.println("Enter date in format yyyy-MM-dd: ");
+                        String date = scanner.nextLine();
+                        Date myDate = Date.valueOf(date);
+                        AdminOperations.viewDailyDeliveryList(myDate);
+                        break;
+
+                    case 12:
+                        AdminOperations.viewAllSubscriptions();
+                        break;
+
+                    case 13:
+                        AdminOperations.viewOrderDashboard();
+                        break;
+
+                    case 14:
                         System.out.println("Exiting...");
                         scanner.close();
                         return;
